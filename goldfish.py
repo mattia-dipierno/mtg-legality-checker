@@ -13,24 +13,34 @@ def estrai_mazzo(url):
         response.headers.update(headers)
         page = response.get(url, timeout=10)
         if page.status_code != 200:
-            return {}
+            return {}, {}
     except:
-        return {}
+        return {}, {}
 
     soup = BeautifulSoup(page.content, 'html.parser')
     deck_input = soup.find('input', {'id': 'deck_input_deck'})
 
     if not deck_input:
-        return {}
+        return {}, {}
 
-    carte = {}
-    for line in deck_input.get('value', '').strip().split('\n'):
+    raw_lines = deck_input.get('value', '').strip().split('\n')
+
+    main_deck = {}
+    sideboard = {}
+
+    current_section = main_deck
+    for line in raw_lines:
         line = line.strip()
-        if line and line.lower() != 'sideboard':
-            match = re.match(r'^(\d+)\s+(.+)$', line)
-            if match:
-                qty, name = int(match.group(1)), match.group(2).strip()
-                if name:
-                    carte[name] = carte.get(name, 0) + qty
+        if not line:
+            continue
+        if line.lower() == 'sideboard':
+            current_section = sideboard
+            continue
+        match = re.match(r'^(\d+)\s+(.+)$', line)
+        if match:
+            qty = int(match.group(1))
+            name = match.group(2).strip()
+            current_section[name] = current_section.get(name, 0) + qty
 
-    return carte
+    return main_deck, sideboard
+
