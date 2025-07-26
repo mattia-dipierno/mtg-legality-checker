@@ -1,0 +1,19 @@
+# Evita di pushare il virtual environment
+venv/
+
+# Evita file temporanei Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# File di log o output vari
+*.log
+*.out
+*.tmp
+
+# File di sistema
+.DS_Store
+Thumbs.db
+
+# Config personali di VS Code (opzionale)
+.vscode/
